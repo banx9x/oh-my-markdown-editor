@@ -23,9 +23,7 @@ import { editorTheme } from "./EditorTheme";
 import { EditorContext } from "./Editor";
 
 const View = styled.div<{
-    isFullScreen: boolean;
     isPreview: boolean;
-    wrapperRef: React.MutableRefObject<HTMLDivElement | null>;
     editorHeight: number;
 }>`
     ${({ isPreview }) =>
@@ -39,19 +37,11 @@ const View = styled.div<{
                   width: 100%;
               `}
 
-    ${({ isFullScreen, wrapperRef, editorHeight }) =>
-        isFullScreen
-            ? css`
-                  & {
-                      height: ${wrapperRef.current?.clientHeight ||
-                      editorHeight}px;
-                  }
-              `
-            : css`
-                  & {
-                      height: ${editorHeight}px;
-                  }
-              `}
+    ${({ editorHeight }) => css`
+        & {
+            height: ${editorHeight}px;
+        }
+    `}
 `;
 
 const EditorView: React.FC = () => {
@@ -59,8 +49,7 @@ const EditorView: React.FC = () => {
     const {
         initialDoc,
         doc,
-        height,
-        wrapperRef,
+        editorHeight,
         editorView,
         setEditorView,
         showFullScreen,
@@ -164,7 +153,6 @@ const EditorView: React.FC = () => {
                     drop(e, view) {
                         if (!uploadFunction) return;
 
-                        // TODO: Validate image types
                         const file = e.dataTransfer?.files[0];
 
                         if (!file) return;
@@ -210,10 +198,8 @@ const EditorView: React.FC = () => {
         <View
             className="editor-view"
             ref={editorRef}
-            isFullScreen={showFullScreen}
             isPreview={showPreview}
-            wrapperRef={wrapperRef}
-            editorHeight={height}
+            editorHeight={editorHeight}
             onMouseEnter={onMouseEnter}
         />
     );

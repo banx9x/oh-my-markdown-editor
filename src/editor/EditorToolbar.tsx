@@ -1,11 +1,9 @@
-import { EditorView as CMEditorView } from "@codemirror/basic-setup";
-import React, { ReactElement, useCallback, useContext, useRef } from "react";
-import { Upload, Button } from "antd";
+import React, { useCallback, useContext, useRef } from "react";
+import { Button } from "antd";
 import {
     BoldOutlined,
     EyeInvisibleOutlined,
     EyeOutlined,
-    FileImageOutlined,
     FullscreenExitOutlined,
     FullscreenOutlined,
     ItalicOutlined,
@@ -15,7 +13,6 @@ import {
 } from "@ant-design/icons";
 
 import styled from "styled-components";
-import { RcFile } from "antd/lib/upload";
 import { EditorContext } from "./Editor";
 const Toolbar = styled.div`
     border: 1px solid #e3e3e3;
@@ -26,7 +23,7 @@ const Toolbar = styled.div`
 const LeftToolbar = styled.div``;
 const RightToolbar = styled.div``;
 
-const EditorToolbar: React.FC = () => {
+const EditorToolbar = React.forwardRef<HTMLDivElement>((props, ref) => {
     const fileRef = useRef<HTMLInputElement>(null);
     const {
         initialDoc,
@@ -110,7 +107,7 @@ const EditorToolbar: React.FC = () => {
     }, [fileRef]);
 
     return (
-        <Toolbar>
+        <Toolbar ref={ref}>
             <LeftToolbar>
                 <Button
                     icon={<BoldOutlined />}
@@ -171,6 +168,6 @@ const EditorToolbar: React.FC = () => {
             />
         </Toolbar>
     );
-};
+});
 
 export default EditorToolbar;

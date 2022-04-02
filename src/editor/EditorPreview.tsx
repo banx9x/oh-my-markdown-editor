@@ -24,27 +24,17 @@ const schema = {
 };
 
 const Preview = styled.div<{
-    isFullScreen: boolean;
-    wrapperRef: React.MutableRefObject<HTMLDivElement | null>;
     previewHeight: number;
 }>`
     & {
         width: 50%;
     }
 
-    ${({ isFullScreen, wrapperRef, previewHeight }) =>
-        isFullScreen
-            ? css`
-                  & {
-                      height: ${wrapperRef.current?.clientHeight ||
-                      previewHeight}px;
-                  }
-              `
-            : css`
-                  & {
-                      height: ${previewHeight}px;
-                  }
-              `}
+    ${({ previewHeight }) => css`
+        & {
+            height: ${previewHeight}px;
+        }
+    `}
 
     & {
         overflow: scroll;
@@ -69,8 +59,7 @@ const EditorPreview: React.FC = () => {
     const {
         initialDoc,
         doc,
-        height,
-        wrapperRef,
+        editorHeight,
         editorView,
         showFullScreen,
         setShowFullScreen,
@@ -123,9 +112,7 @@ const EditorPreview: React.FC = () => {
         <Preview
             className="markdown-body"
             ref={previewRef}
-            isFullScreen={showFullScreen}
-            wrapperRef={wrapperRef}
-            previewHeight={height}
+            previewHeight={editorHeight}
             onMouseEnter={onMouseEnter}
             onScroll={onScroll}
         >

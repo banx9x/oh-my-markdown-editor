@@ -52,9 +52,7 @@ interface Context {
     /** Văn bản hiện tại */
     doc: string;
     /** Chiều cao trình soạn thảo */
-    height: number;
-    /** Container wrapper ref */
-    wrapperRef: React.MutableRefObject<HTMLDivElement | null>;
+    editorHeight: number;
     /** Editor View */
     editorView?: CMEditorView;
     /** Thiết lập CM instance */
@@ -106,14 +104,14 @@ export const EditorContext = createContext<Context>({} as Context);
 
 const Editor = styled.div<{
     isFullScreen: boolean;
-    height: number | string;
+    editorHeight: number;
 }>`
     & {
         display: flex;
         flex-direction: column;
     }
 
-    ${({ isFullScreen, height }) =>
+    ${({ isFullScreen, editorHeight }) =>
         isFullScreen
             ? css`
                   position: fixed !important;
@@ -125,7 +123,7 @@ const Editor = styled.div<{
                   z-index: 9999;
               `
             : css`
-                  height: ${height}px;
+                  height: ${editorHeight}px;
               `}
 `;
 
@@ -145,7 +143,7 @@ const CMEditor: React.FC<Props> = ({
     uploadFunction,
     getCMInstance,
 }) => {
-    const wrapperRef = useRef<HTMLDivElement>(null);
+    const toolbarRef = useRef<HTMLDivElement>(null);
     const [editorView, setEditorView] = useState<CMEditorView>();
     const [showPreview, setShowPreview] = useState(false);
     const [showFullScreen, setShowFullScreen] = useState(false);
@@ -166,14 +164,24 @@ const CMEditor: React.FC<Props> = ({
         return fileTypes.includes(file.type);
     }, []);
 
+    const editorHeight = useMemo(() => {
+        if (!toolbarRef.current) return height;
+
+        const toolbarHeight = toolbarRef.current.clientHeight;
+        const screenHeight = document.documentElement.clientHeight;
+
+        return showFullScreen
+            ? screenHeight - toolbarHeight
+            : height - toolbarHeight;
+    }, [toolbarRef.current, showFullScreen]);
+
     return (
-        <Editor isFullScreen={showFullScreen} height={height}>
+        <Editor isFullScreen={showFullScreen} editorHeight={height}>
             <EditorContext.Provider
                 value={{
                     initialDoc: value,
                     doc: editorView?.state.doc.toString() || value,
-                    height,
-                    wrapperRef,
+                    editorHeight,
                     editorView,
                     setEditorView,
                     showFullScreen,
@@ -192,9 +200,9 @@ const CMEditor: React.FC<Props> = ({
                     markers,
                 }}
             >
-                <EditorToolbar />
+                <EditorToolbar ref={toolbarRef} />
 
-                <Wrapper ref={wrapperRef}>
+                <Wrapper>
                     <EditorView />
                     {showPreview && <EditorPreview />}
                 </Wrapper>
