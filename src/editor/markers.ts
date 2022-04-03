@@ -108,14 +108,6 @@ const image = (view: CMEditorView, alt?: string, url?: string) => {
     );
 };
 
-const unorderedList = (view: CMEditorView) => {
-
-}
-
-const orderedList = (view: CMEditorView) => {
-    
-}
-
 export interface Markers {
     bold: (view: CMEditorView) => void;
     italic: (view: CMEditorView) => void;
