@@ -3,7 +3,7 @@ import {
     EditorView as CMEditorView,
     basicSetup,
 } from "@codemirror/basic-setup";
-import { keymap, ViewUpdate } from "@codemirror/view";
+import { keymap } from "@codemirror/view";
 import React, {
     useCallback,
     useContext,

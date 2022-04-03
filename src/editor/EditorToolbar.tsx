@@ -8,8 +8,10 @@ import {
     FullscreenOutlined,
     ItalicOutlined,
     LinkOutlined,
+    OrderedListOutlined,
     PictureOutlined,
     StrikethroughOutlined,
+    UnorderedListOutlined,
 } from "@ant-design/icons";
 
 import styled from "styled-components";
@@ -131,6 +133,16 @@ const EditorToolbar = React.forwardRef<HTMLDivElement>((props, ref) => {
                 />
                 <Button
                     icon={<PictureOutlined />}
+                    type="text"
+                    onClick={openFileChooser}
+                />
+                <Button
+                    icon={<UnorderedListOutlined />}
+                    type="text"
+                    onClick={openFileChooser}
+                />
+                <Button
+                    icon={<OrderedListOutlined />}
                     type="text"
                     onClick={openFileChooser}
                 />

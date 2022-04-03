@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import Editor from "./editor/Editor";
+import CMEditor from "./Editor";
 
 function App() {
     const [doc, setDoc] = useState(
@@ -36,7 +36,7 @@ function App() {
 
     return (
         <div className="App" style={{ padding: "10px" }}>
-            <Editor
+            <CMEditor
                 value={doc}
                 onChange={setDoc}
                 onSave={handleSave}
