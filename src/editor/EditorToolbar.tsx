@@ -1,185 +1,215 @@
-import React, { useCallback, useContext, useRef } from "react";
-import { Button } from "antd";
+import React, { useCallback, useRef } from 'react';
 import {
-    BoldOutlined,
-    EyeInvisibleOutlined,
-    EyeOutlined,
-    FullscreenExitOutlined,
-    FullscreenOutlined,
-    ItalicOutlined,
-    LinkOutlined,
-    OrderedListOutlined,
-    PictureOutlined,
-    StrikethroughOutlined,
-    UnorderedListOutlined,
-} from "@ant-design/icons";
+  BiBold,
+  BiItalic,
+  BiStrikethrough,
+  BiLink,
+  BiCode,
+  BiCodeBlock,
+  BiListOl,
+  BiListUl,
+  BiImageAdd,
+  BiShow,
+  BiHide,
+  BiFullscreen,
+  BiExitFullscreen,
+} from 'react-icons/bi';
+import style from './EditorToolbar.module.css';
+import { EditorView } from '@codemirror/basic-setup';
+import {
+  bold,
+  italic,
+  strikethrough,
+  link,
+  image,
+  code,
+  blockCode,
+  bulletList,
+  numberList,
+} from './markers';
 
-import styled from "styled-components";
-import { EditorContext } from "./Editor";
-const Toolbar = styled.div`
-    border: 1px solid #e3e3e3;
-    display: flex;
-    justify-content: space-between;
-`;
+interface EditorToolbarProps {
+  view?: EditorView;
+  fullscreen: boolean;
+  showFullscreen: React.Dispatch<React.SetStateAction<boolean>>;
+  preview: boolean;
+  showPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  acceptTypes: string;
+  uploadFunction?: (file: File, success: (url: string) => void) => void;
+}
 
-const LeftToolbar = styled.div``;
-const RightToolbar = styled.div``;
-
-const EditorToolbar = React.forwardRef<HTMLDivElement>((props, ref) => {
+const EditorToolbar: React.ForwardRefExoticComponent<
+  EditorToolbarProps & React.RefAttributes<HTMLDivElement>
+> = React.forwardRef(
+  (
+    {
+      view,
+      fullscreen,
+      showFullscreen,
+      preview,
+      showPreview,
+      acceptTypes,
+      uploadFunction,
+    },
+    ref
+  ) => {
     const fileRef = useRef<HTMLInputElement>(null);
-    const {
-        initialDoc,
-        doc,
-        editorView,
-        setEditorView,
-        showFullScreen,
-        setShowFullScreen,
-        currentActive,
-        setCurrentActive,
-        scrollPosition,
-        setScrollPosition,
-        showPreview,
-        setShowPreview,
-        acceptTypes,
-        validateFile,
-        uploadFunction,
-        onChange,
-        onSave,
-        markers,
-    } = useContext(EditorContext);
 
     const handleBoldMarker = useCallback(() => {
-        if (!editorView) return;
+      if (!view) return;
 
-        markers.bold(editorView);
-        editorView.focus();
-    }, [editorView]);
+      bold(view);
+    }, [view]);
 
     const handleItalicMarker = useCallback(() => {
-        if (!editorView) return;
+      if (!view) return;
 
-        markers.italic(editorView);
-        editorView.focus();
-    }, [editorView]);
+      italic(view);
+    }, [view]);
 
     const handleStrikethroughMarker = useCallback(() => {
-        if (!editorView) return;
+      if (!view) return;
 
-        markers.strikethrough(editorView);
-        editorView.focus();
-    }, [editorView]);
+      strikethrough(view);
+    }, [view]);
 
     const handleImageMarker = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>) => {
-            if (!editorView || !uploadFunction) return;
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!view || !uploadFunction || !e.target.files || !e.target.files[0])
+          return;
 
-            if (e.target.files && e.target.files[0]) {
-                const file = e.target.files[0];
+        const file = e.target.files[0];
+        const fileTypes = acceptTypes.split(',');
 
-                if (validateFile(file))
-                    uploadFunction(
-                        file,
-                        (url) => markers.image(editorView, file.name, url),
-                        () => {}
-                    );
-            }
-        },
-        [editorView]
+        if (!fileTypes.includes(file.type)) return;
+
+        uploadFunction(file, (url) => image(view, file.name, url));
+      },
+      [view]
     );
 
     const handleLinkMarker = useCallback(() => {
-        if (!editorView) return;
+      if (!view) return;
 
-        markers.link(editorView);
-        editorView.focus();
-    }, [editorView]);
+      link(view);
+      view.focus();
+    }, [view]);
+
+    const handleCodeMarker = useCallback(() => {
+      if (!view) return;
+
+      code(view);
+    }, [view]);
+
+    const handleBlockCodeMarker = useCallback(() => {
+      if (!view) return;
+
+      blockCode(view);
+    }, [view]);
+
+    const handleBulletList = useCallback(() => {
+      if (!view) return;
+
+      bulletList(view);
+    }, [view]);
+
+    const handleNubmerList = useCallback(() => {
+      if (!view) return;
+
+      numberList(view);
+    }, [view]);
 
     const handleChangePreview = useCallback(() => {
-        setShowPreview(!showPreview);
-    }, [showPreview]);
+      showPreview(!preview);
+    }, [preview]);
 
     const handleChangeFullScreen = useCallback(() => {
-        setShowFullScreen(!showFullScreen);
-    }, [showFullScreen]);
+      showFullscreen(!fullscreen);
+    }, [fullscreen]);
 
     const openFileChooser = useCallback(() => {
-        if (!fileRef.current || !uploadFunction) return;
+      if (!fileRef.current || !uploadFunction) return;
 
-        fileRef.current.click();
+      fileRef.current.click();
     }, [fileRef]);
 
     return (
-        <Toolbar ref={ref}>
-            <LeftToolbar>
-                <Button
-                    icon={<BoldOutlined />}
-                    type="text"
-                    onClick={handleBoldMarker}
-                />
-                <Button
-                    icon={<ItalicOutlined />}
-                    type="text"
-                    onClick={handleItalicMarker}
-                />
-                <Button
-                    icon={<StrikethroughOutlined />}
-                    type="text"
-                    onClick={handleStrikethroughMarker}
-                />
-                <Button
-                    icon={<LinkOutlined />}
-                    type="text"
-                    onClick={handleLinkMarker}
-                />
-                <Button
-                    icon={<PictureOutlined />}
-                    type="text"
-                    onClick={openFileChooser}
-                />
-                <Button
-                    icon={<UnorderedListOutlined />}
-                    type="text"
-                    onClick={openFileChooser}
-                />
-                <Button
-                    icon={<OrderedListOutlined />}
-                    type="text"
-                    onClick={openFileChooser}
-                />
-            </LeftToolbar>
+      <div
+        className={style.container}
+        ref={ref}>
+        <div className={style.left}>
+          <button
+            className={style.button}
+            onClick={handleBoldMarker}>
+            <BiBold />
+          </button>
+          <button
+            className={style.button}
+            onClick={handleItalicMarker}>
+            <BiItalic />
+          </button>
+          <button
+            className={style.button}
+            onClick={handleStrikethroughMarker}>
+            <BiStrikethrough />
+          </button>
+          <button
+            className={style.button}
+            onClick={handleLinkMarker}>
+            <BiLink />
+          </button>
+          <button
+            className={style.button}
+            onClick={handleCodeMarker}>
+            <BiCode />
+          </button>
+          <button
+            className={style.button}
+            onClick={handleBlockCodeMarker}>
+            <BiCodeBlock />
+          </button>
+          <button
+            className={style.button}
+            onClick={handleBulletList}>
+            <BiListUl />
+          </button>
+          <button
+            className={style.button}
+            onClick={handleNubmerList}>
+            <BiListOl />
+          </button>
+          <button
+            className={style.button}
+            onClick={openFileChooser}>
+            <BiImageAdd />
+          </button>
+        </div>
 
-            <RightToolbar>
-                <Button
-                    icon={
-                        showPreview ? <EyeInvisibleOutlined /> : <EyeOutlined />
-                    }
-                    type="text"
-                    onClick={handleChangePreview}
-                />
-                <Button
-                    icon={
-                        showFullScreen ? (
-                            <FullscreenExitOutlined />
-                        ) : (
-                            <FullscreenOutlined />
-                        )
-                    }
-                    type="text"
-                    onClick={handleChangeFullScreen}
-                />
-            </RightToolbar>
+        <div className={style.right}>
+          <button
+            className={style.button}
+            onClick={handleChangePreview}>
+            {preview ? <BiHide /> : <BiShow />}
+          </button>
+          <button
+            className={style.button}
+            onClick={handleChangeFullScreen}>
+            {fullscreen ? <BiExitFullscreen /> : <BiFullscreen />}
+          </button>
+        </div>
 
-            {/* Hidden input dùng cho icon tải ảnh lên */}
-            <input
-                ref={fileRef}
-                hidden
-                type="file"
-                accept={acceptTypes}
-                multiple={false}
-                onChange={handleImageMarker}
-            />
-        </Toolbar>
+        {/* Hidden input dùng cho icon tải ảnh lên */}
+        <input
+          ref={fileRef}
+          hidden
+          type='file'
+          accept={acceptTypes}
+          multiple={false}
+          onChange={handleImageMarker}
+        />
+      </div>
     );
-});
+  }
+);
 
-export default EditorToolbar;
+export default React.memo(EditorToolbar);

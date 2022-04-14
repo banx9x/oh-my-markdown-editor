@@ -1,208 +1,173 @@
 import {
-    EditorState as CMEditorState,
-    EditorView as CMEditorView,
-    basicSetup,
-} from "@codemirror/basic-setup";
-import { keymap } from "@codemirror/view";
-import React, {
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-} from "react";
-import styled, { css } from "styled-components";
+  EditorState as CMEditorState,
+  EditorView as CMEditorView,
+  basicSetup,
+} from '@codemirror/basic-setup';
+import { keymap } from '@codemirror/view';
+import { commentKeymap } from '@codemirror/comment';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
-    markdown,
-    markdownLanguage,
-    markdownKeymap,
-} from "@codemirror/lang-markdown";
-import { languages } from "@codemirror/language-data";
-import { indentWithTab } from "@codemirror/commands";
-import { editorTheme } from "./EditorTheme";
-import { EditorContext } from "./Editor";
+  markdown,
+  markdownLanguage,
+  markdownKeymap,
+} from '@codemirror/lang-markdown';
+import { languages } from '@codemirror/language-data';
+import { indentWithTab } from '@codemirror/commands';
+import { editorTheme } from './EditorTheme';
+import { image } from './markers';
+import { commands } from './commands';
 
-const View = styled.div<{
-    isPreview: boolean;
-    editorHeight: number;
-}>`
-    ${({ isPreview }) =>
-        isPreview
-            ? css`
-                  & {
-                      width: 50%;
-                  }
-              `
-            : css`
-                  width: 100%;
-              `}
+import {
+  Highlight,
+  Underline,
+  SubScript,
+  SuperScript,
+  InlineCode,
+} from './customs';
 
-    ${({ editorHeight }) => css`
-        & {
-            height: ${editorHeight}px;
-        }
-    `}
-`;
+interface EditorViewProps {
+  initialDoc: string;
+  editorHeight: number;
+  view?: CMEditorView;
+  setEditorView: React.Dispatch<React.SetStateAction<CMEditorView | undefined>>;
+  currentActive: 'editor' | 'preview';
+  setCurrentActive: React.Dispatch<React.SetStateAction<'editor' | 'preview'>>;
+  scrollPosition: number;
+  setScrollPosition: React.Dispatch<React.SetStateAction<number>>;
+  preview: boolean;
+  fullscreen: boolean;
+  acceptTypes: string;
+  uploadFunction?: (file: File, success: (url: string) => void) => void;
+  onChange: (doc: string) => void;
+  onSave: (doc: string) => void;
+}
 
-const EditorView: React.FC = () => {
-    const editorRef = useRef<HTMLDivElement>(null);
-    const {
-        initialDoc,
-        doc,
-        editorHeight,
-        editorView,
-        setEditorView,
-        showFullScreen,
-        setShowFullScreen,
-        currentActive,
-        setCurrentActive,
-        scrollPosition,
-        setScrollPosition,
-        showPreview,
-        setShowPreview,
-        acceptTypes,
-        validateFile,
-        uploadFunction,
-        onChange,
-        onSave,
-        markers,
-    } = useContext(EditorContext);
+const EditorView: React.FC<EditorViewProps> = ({
+  initialDoc,
+  editorHeight,
+  view,
+  setEditorView,
+  currentActive,
+  setCurrentActive,
+  scrollPosition,
+  setScrollPosition,
+  preview,
+  fullscreen,
+  acceptTypes,
+  uploadFunction,
+  onChange,
+  onSave,
+}) => {
+  const editorRef = useRef<HTMLDivElement>(null);
 
-    const boldCommand = useCallback((view: CMEditorView): boolean => {
-        markers.bold(view);
-        return false;
-    }, []);
+  useEffect(() => {
+    if (!editorRef.current) return;
 
-    const italicCommand = useCallback((view: CMEditorView): boolean => {
-        markers.italic(view);
-        return true;
-    }, []);
+    const editorState = CMEditorState.create({
+      doc: initialDoc,
+      extensions: [
+        commands,
+        basicSetup,
+        markdown({
+          base: markdownLanguage,
+          codeLanguages: languages,
+          addKeymap: true,
+          extensions: [
+            Highlight,
+            Underline,
+            SubScript,
+            SuperScript,
+            InlineCode,
+          ],
+        }),
+        editorTheme,
+        keymap.of([indentWithTab, ...markdownKeymap, ...commentKeymap]),
+        CMEditorView.updateListener.of((update) => {
+          if (update.docChanged) {
+            onChange(update.state.doc.toString());
+          }
+        }),
+        CMEditorView.domEventHandlers({
+          scroll(e, view) {
+            setScrollPosition(
+              view.scrollDOM.scrollTop / view.scrollDOM.scrollHeight
+            );
+          },
+          paste(e, view) {
+            if (
+              !uploadFunction ||
+              !e.clipboardData ||
+              !e.clipboardData.files ||
+              !e.clipboardData.files[0]
+            )
+              return;
 
-    const saveCommand = useCallback((view: CMEditorView): boolean => {
-        onSave && onSave(view.state.doc.toString());
-        return true;
-    }, []);
+            const file = e.clipboardData.files[0];
+            const fileTypes = acceptTypes.split(',');
 
-    const commands = useMemo(
-        () =>
-            keymap.of([
-                {
-                    mac: "cmd-b",
-                    win: "ctrl-b",
-                    run: boldCommand,
-                },
-                {
-                    mac: "cmd-i",
-                    win: "ctrl-i",
-                    run: italicCommand,
-                },
-                {
-                    mac: "cmd-s",
-                    win: "ctrl-s",
-                    run: saveCommand,
-                },
-            ]),
-        []
-    );
+            if (!fileTypes.includes(file.type)) return;
 
-    useEffect(() => {
-        if (!editorRef.current) return;
-
-        const editorState = CMEditorState.create({
-            doc: initialDoc,
-            extensions: [
-                commands,
-                basicSetup,
-                markdown({
-                    base: markdownLanguage,
-                    codeLanguages: languages,
-                    addKeymap: true,
-                }),
-                editorTheme,
-                keymap.of([indentWithTab, ...markdownKeymap]),
-                CMEditorView.updateListener.of((update) => {
-                    if (update.changes) {
-                        onChange && onChange(update.state.doc.toString());
-                    }
-                }),
-                CMEditorView.domEventHandlers({
-                    scroll(e, view) {
-                        setScrollPosition(
-                            view.scrollDOM.scrollTop /
-                                view.scrollDOM.scrollHeight
-                        );
-                    },
-                    paste(e, view) {
-                        if (!uploadFunction) return;
-
-                        const file = e.clipboardData?.files[0];
-
-                        if (!file) return;
-
-                        if (validateFile(file))
-                            uploadFunction(
-                                file,
-                                (url) => {
-                                    markers.image(view, file.name, url);
-                                },
-                                (error) => {
-                                    console.log(error);
-                                }
-                            );
-                    },
-                    drop(e, view) {
-                        if (!uploadFunction) return;
-
-                        const file = e.dataTransfer?.files[0];
-
-                        if (!file) return;
-
-                        if (validateFile(file))
-                            uploadFunction(
-                                file,
-                                (url) => {
-                                    markers.image(view, file.name, url);
-                                },
-                                (error) => {
-                                    console.log(error);
-                                }
-                            );
-                    },
-                }),
-            ],
-        });
-
-        const editorView =
-            editorRef.current &&
-            new CMEditorView({
-                state: editorState,
-                parent: editorRef.current,
+            uploadFunction(file, (url) => {
+              image(view, file.name, url);
             });
+          },
+          drop(e, view) {
+            if (
+              !uploadFunction ||
+              !e.dataTransfer ||
+              !e.dataTransfer.files ||
+              !e.dataTransfer.files[0]
+            )
+              return;
 
-        setEditorView(editorView);
-    }, [editorRef]);
+            const file = e.dataTransfer.files[0];
+            const fileTypes = acceptTypes.split(',');
 
-    useEffect(() => {
-        if (!editorView) return;
-        if (currentActive == "editor") return;
+            if (!fileTypes.includes(file.type)) return;
 
-        editorView.scrollDOM.scrollTop =
-            editorView.scrollDOM.scrollHeight * scrollPosition;
+            uploadFunction(file, (url) => {
+              image(view, file.name, url);
+            });
+          },
+        }),
+      ],
     });
 
-    const onMouseEnter = useCallback(() => {
-        if (currentActive != "editor") setCurrentActive("editor");
-    }, [currentActive]);
+    const editorView =
+      editorRef.current &&
+      new CMEditorView({
+        state: editorState,
+        parent: editorRef.current,
+      });
 
-    return (
-        <View
-            className="editor-view"
-            ref={editorRef}
-            isPreview={showPreview}
-            editorHeight={editorHeight}
-            onMouseEnter={onMouseEnter}
-        />
-    );
+    setEditorView(editorView);
+
+    return () => {
+      editorView.destroy();
+    };
+  }, [editorRef]);
+
+  useEffect(() => {
+    if (!view) return;
+    if (currentActive == 'editor') return;
+
+    view.scrollDOM.scrollTop = view.scrollDOM.scrollHeight * scrollPosition;
+  });
+
+  const onMouseEnter = useCallback(() => {
+    if (currentActive != 'editor') setCurrentActive('editor');
+  }, [currentActive]);
+
+  return (
+    <div
+      className='editor-view'
+      ref={editorRef}
+      onMouseEnter={onMouseEnter}
+      style={{
+        width: preview ? '50%' : '100%',
+        height: fullscreen ? '100%' : editorHeight,
+      }}></div>
+  );
 };
 
-export default EditorView;
+export default React.memo(EditorView);

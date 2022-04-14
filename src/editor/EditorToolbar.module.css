@@ -1,0 +1,26 @@
+.container {
+  background-color: #ffffff;
+  border-bottom: 1px solid #e3e3e3;
+  display: flex;
+  justify-content: space-between;
+}
+
+.left {
+  background-color: transparent;
+}
+
+.right {
+  background-color: transparent;
+}
+
+.button {
+  border: 0;
+  outline: none;
+  cursor: pointer;
+  background-color: transparent;
+  padding: 8px 8px 4px;
+}
+
+.button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
