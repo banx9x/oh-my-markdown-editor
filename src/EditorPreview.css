@@ -1,23 +1,24 @@
-.container {
+.editor-preview {
   width: 50%;
   overflow-y: scroll;
   overflow-x: hidden;
   padding: 5px 10px;
 }
 
-.container h1,
-.container h2,
-.container h3,
-.container h4 {
+.editor-preview h1,
+.editor-preview h2,
+.editor-preview h3,
+.editor-preview h4 {
   border-bottom: 0;
   margin-top: 0;
 }
 
-.container pre {
-  overflow-x: scroll;
+.editor-preview pre {
+  overflow-x: auto;
+  padding: 0;
 }
 
-.container code {
+.editor-preview code {
   background: rgba(229, 83, 75, 0.15);
   color: #e5534b;
 }

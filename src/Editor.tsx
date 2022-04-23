@@ -1,7 +1,7 @@
+/* eslint-disable spaced-comment */
 import { EditorView as CMEditorView } from '@codemirror/basic-setup';
 import React, {
   useCallback,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -9,7 +9,17 @@ import React, {
 import EditorPreview from './EditorPreview';
 import EditorToolbar from './EditorToolbar';
 import EditorView from './EditorView';
-import style from './Editor.module.css';
+import classNames from 'classnames';
+import './Editor.css';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import rehypeStringify from 'rehype-stringify';
+import rehypeRaw from 'rehype-raw';
+import rehypeSlug from 'rehype-slug';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeFigure from 'rehype-figure';
+import rehypeVideo from 'rehype-video';
 
 interface EditorProps {
   /** Giá trị content khởi tạo */
@@ -26,8 +36,6 @@ interface EditorProps {
   acceptTypes?: string;
   /** Hàm chạy khi kéo thả/copy pate file vào editor */
   uploadFunction?: (file: File, onSuccess: (url: string) => void) => void;
-  /** Hàm lấy instance của CM, cho phép thao tác trực tiếp */
-  getCMInstance?: (editorView: CMEditorView | null) => void;
 }
 
 const CMEditor: React.FC<EditorProps> = ({
@@ -37,7 +45,6 @@ const CMEditor: React.FC<EditorProps> = ({
   onSave,
   acceptTypes = 'image/jpg,image/jpeg,image/png',
   uploadFunction,
-  getCMInstance,
 }) => {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [doc, setDoc] = useState(initialDoc);
@@ -51,25 +58,12 @@ const CMEditor: React.FC<EditorProps> = ({
 
   const handleChange = useCallback((doc) => {
     setDoc(doc);
-  }, []);
-
-  useEffect(() => {
     onChange && onChange(doc);
-  }, [doc]);
+  }, []);
 
   const handleSave = useCallback((doc) => {
     onSave && onSave(doc);
   }, []);
-
-  useMemo(() => {
-    if (!editorView) return;
-
-    getCMInstance && getCMInstance(editorView);
-
-    return () => {
-      getCMInstance && getCMInstance(null);
-    };
-  }, [editorView]);
 
   const editorHeight = useMemo(() => {
     if (!toolbarRef.current) return height;
@@ -84,7 +78,10 @@ const CMEditor: React.FC<EditorProps> = ({
 
   return (
     <div
-      className={showFullScreen ? style.fullscreen : style.container}
+      className={classNames({
+        container: true,
+        fullscreen: showFullScreen,
+      })}
       style={{ height }}>
       <EditorToolbar
         ref={toolbarRef}
@@ -98,7 +95,7 @@ const CMEditor: React.FC<EditorProps> = ({
       />
 
       <div
-        className={style.editor}
+        className='editor'
         style={{ height: editorHeight }}>
         <EditorView
           initialDoc={initialDoc}

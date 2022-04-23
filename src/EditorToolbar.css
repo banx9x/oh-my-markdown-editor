@@ -1,19 +1,19 @@
-.container {
+.editor-toolbar {
   background-color: #ffffff;
   border-bottom: 1px solid #e3e3e3;
   display: flex;
   justify-content: space-between;
 }
 
-.left {
+.left-side {
   background-color: transparent;
 }
 
-.right {
+.right-side {
   background-color: transparent;
 }
 
-.button {
+.editor-toolbar .button {
   border: 0;
   outline: none;
   cursor: pointer;
@@ -21,6 +21,6 @@
   padding: 8px 8px 4px;
 }
 
-.button:hover {
+.editor-toolbar .button:hover {
   background-color: rgba(0, 0, 0, 0.05);
 }

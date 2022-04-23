@@ -5,7 +5,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [state, setState] = useState({
     other: '000',
-    doc: '# Fuck',
+    doc: ``,
   });
 
   const handleUploadImage = useCallback(
@@ -93,4 +93,3 @@ function App() {
 }
 
 export default App;
-

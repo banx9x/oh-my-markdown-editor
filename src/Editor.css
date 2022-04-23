@@ -9,8 +9,7 @@
   border: 1px solid #e3e3e3;
 }
 
-.fullscreen {
-  composes: container;
+.container.fullscreen {
   position: fixed !important;
   top: 0;
   left: 0;

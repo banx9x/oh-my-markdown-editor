@@ -9,9 +9,12 @@ type Tokens = {
 const RemarkCode: React.FC<
   React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
 > = (props) => {
+  console.log(props);
   const [spans, setSpans] = useState<Tokens>([]);
   const { className } = props;
   const langName = (className || '').substring(9);
+
+  console.log(className, langName);
 
   useEffect(() => {
     getLanguage(langName).then((language) => {

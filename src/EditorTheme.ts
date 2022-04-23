@@ -175,25 +175,27 @@ export const customHighlight = HighlightStyle.define([
   {
     tag: [t.keyword, t.operatorKeyword],
     color: hue3,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.name, t.deleted, t.character, t.propertyName, t.macroName],
     color: syntaxFg,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     // đoạn này để test
     tag: [t.deleted, t.character, t.propertyName, t.macroName],
     color: 'oragne',
+    fontFamily: 'Mono, monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.labelName, t.propertyName, t.namespace, t.tagName],
     color: hue5,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.color, t.constant(t.variableName), t.standard(t.name)],
@@ -206,8 +208,8 @@ export const customHighlight = HighlightStyle.define([
   {
     tag: [t.definition(t.variableName), t.className],
     color: hue6_2, // chưa ổn
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.separator],
@@ -223,31 +225,31 @@ export const customHighlight = HighlightStyle.define([
       t.function(t.variableName),
     ],
     color: hue1,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.className],
     color: hue6_2,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.number],
     color: hue6,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.self, t.namespace],
     color: hue5_2,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.url, t.escape, t.regexp, t.link, t.special(t.string), t.string],
     color: hue4,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
+    fontFamily: 'Mono,monospace',
   },
   {
     tag: [t.operator],
@@ -298,8 +300,8 @@ export const customHighlight = HighlightStyle.define([
   {
     tag: [t.atom, t.bool, t.special(t.variableName), t.null, t.number],
     color: hue6,
-    fontFamily: 'Menlo,Helvetica, Mono,monospace',
-    fontSize: '14px',
+    fontFamily: 'Mono,monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.squareBracket, t.paren, t.brace],
@@ -332,6 +334,8 @@ export const customHighlight = HighlightStyle.define([
   {
     tag: [t.function(t.propertyName)],
     color: hue2,
+    fontFamily: 'Mono, monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.quote],
@@ -346,6 +350,17 @@ export const customHighlight = HighlightStyle.define([
     backgroundColor: 'rgba(229, 83, 75, 0.15)',
     borderRadius: '6px',
     color: '#e5534b',
+  },
+  {
+    tag: [t.literal, t.string],
+    fontFamily: 'Mono, monospace',
+    fontSize: '15px',
+  },
+  {
+    tag: [t.comment],
+    color: '#7d8799',
+    fontFamily: 'Mono, monospace',
+    fontSize: '15px',
   },
   {
     tag: [t.changed],

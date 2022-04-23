@@ -109,9 +109,15 @@ export const InlineCode = {
     {
       name: 'InlineCode',
       parse(cx, next, pos) {
+        // console.log(next, pos);
         if (next != 96 /* '`' */) {
           return -1;
         }
+
+        if (cx.char(pos - 1) == 96) {
+          return -1;
+        }
+
         return cx.addDelimiter(InlineCodeDelim, pos, pos + 1, true, true);
       },
       after: 'BlockQuote',
